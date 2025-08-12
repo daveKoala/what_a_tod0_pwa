@@ -170,6 +170,7 @@ class TodoApp {
 
   deleteTodo(id) {
     this.todos = this.todos.filter((t) => t.id !== id);
+    this.recordDeletedTodo(id);
     this.saveTodos();
     this.render();
   }
@@ -645,20 +646,46 @@ ${
     const localTodoMap = new Map(this.todos.map((todo) => [todo.id, todo]));
     const remoteTodoMap = new Map(remoteTodos.map((todo) => [todo.id, todo]));
 
-    // Start with remote todos (they take precedence)
+    // Start with remote todos (they take precedence for updates)
     const mergedTodos = [...remoteTodos];
 
-    // Add local todos that don't exist remotely
+    // Add local todos that don't exist remotely (newly created locally)
     for (const localTodo of this.todos) {
       if (!remoteTodoMap.has(localTodo.id)) {
         mergedTodos.push(localTodo);
       }
     }
 
-    // Sort by creation date (newest first)
-    mergedTodos.sort((a, b) => new Date(b.created) - new Date(a.created));
+    // Store the list of todos that existed locally before the merge
+    // This prevents deleted todos from being re-added during quick push/pull
+    const localTodoIds = new Set(this.todos.map(t => t.id));
+    
+    // If a todo exists remotely but was recently deleted locally, remove it
+    const recentlyDeleted = this.getRecentlyDeletedTodos();
+    const finalTodos = mergedTodos.filter(todo => !recentlyDeleted.has(todo.id));
 
-    this.todos = mergedTodos;
+    // Sort by creation date (newest first)
+    finalTodos.sort((a, b) => new Date(b.created) - new Date(a.created));
+
+    this.todos = finalTodos;
+  }
+
+  getRecentlyDeletedTodos() {
+    // Get recently deleted todos (within last 5 minutes)
+    const recentlyDeleted = JSON.parse(localStorage.getItem('recently_deleted_todos') || '[]');
+    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+    
+    // Clean up old deletions
+    const validDeleted = recentlyDeleted.filter(item => item.deletedAt > fiveMinutesAgo);
+    localStorage.setItem('recently_deleted_todos', JSON.stringify(validDeleted));
+    
+    return new Set(validDeleted.map(item => item.id));
+  }
+
+  recordDeletedTodo(todoId) {
+    const recentlyDeleted = JSON.parse(localStorage.getItem('recently_deleted_todos') || '[]');
+    recentlyDeleted.push({ id: todoId, deletedAt: Date.now() });
+    localStorage.setItem('recently_deleted_todos', JSON.stringify(recentlyDeleted));
   }
 
   async syncToGit() {
@@ -719,12 +746,16 @@ ${
 
       // Delete files for todos that no longer exist
       const currentFilenames = new Set(files.map((f) => f.filename));
-      const deletePromises = existingFiles
+      const filesToDelete = existingFiles
         .filter(
           (filename) => filename.startsWith("todo-") && filename.endsWith(".md")
         )
-        .filter((filename) => !currentFilenames.has(filename))
-        .map((filename) => this.deleteFile(filename));
+        .filter((filename) => !currentFilenames.has(filename));
+      
+      console.log(`Files to delete: ${filesToDelete.length}`, filesToDelete);
+      console.log(`Current files: ${files.length}`, files.map(f => f.filename));
+      
+      const deletePromises = filesToDelete.map((filename) => this.deleteFile(filename));
 
       await Promise.all([...updatePromises, ...deletePromises]);
 
@@ -733,8 +764,8 @@ ${
         "success"
       );
       
-      // Small delay to ensure GitHub API consistency
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Longer delay to ensure GitHub API consistency for deletions
+      await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (error) {
       console.error("Git sync error:", error);
       // Only show user-friendly errors, not API noise
@@ -870,6 +901,8 @@ ${
     const path = `${gitPath || ""}${filename}`;
 
     try {
+      console.log(`Attempting to delete file: ${filename}`);
+      
       // Get file SHA
       const fileResponse = await fetch(
         `https://api.github.com/repos/${repoUrl}/contents/${path}?ref=${gitBranch}`,
@@ -882,6 +915,7 @@ ${
       );
 
       if (!fileResponse.ok) {
+        console.log(`File ${filename} doesn't exist remotely, skipping deletion`);
         return; // File doesn't exist
       }
 
@@ -906,7 +940,10 @@ ${
 
       if (!response.ok) {
         const error = await response.json();
+        console.error(`Failed to delete ${filename}:`, error);
         throw new Error(`Failed to delete ${filename}: ${error.message}`);
+      } else {
+        console.log(`Successfully deleted file: ${filename}`);
       }
     } catch (error) {
       console.warn(`Could not delete ${filename}:`, error);

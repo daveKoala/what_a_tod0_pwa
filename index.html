@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <title>Todo PWA</title>
+    <link rel="manifest"
+        href="data:application/manifest+json,{%22name%22:%22Todo%20PWA%22,%22short_name%22:%22Todos%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%232563eb%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232563eb'/%3E%3Ctext x='50' y='65' font-family='Arial' font-size='60' fill='white' text-anchor='middle'%3E✓%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}">
+    <link rel="stylesheet" href="/public/style.css">
+
+</head>
+
+<body>
+    <!-- Setup Page -->
+    <div class="setup-page" id="setupPage">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h1>What a todo</h1>
+                <p>Configure git sync to keep your todos synchronized across devices</p>
+            </div>
+
+            <div class="setup-form">
+                <div class="input-group">
+                    <label for="setupRepoUrl">Repository URL</label>
+                    <input type="text" id="setupRepoUrl" placeholder="e.g., username/my-todos">
+                </div>
+
+                <div class="input-group">
+                    <label for="setupGitToken">Personal Access Token</label>
+                    <input type="password" id="setupGitToken" placeholder="Your GitHub PAT with repo access">
+                </div>
+
+                <div class="input-group">
+                    <label for="setupGitBranch">Branch</label>
+                    <input type="text" id="setupGitBranch" placeholder="main" value="main">
+                </div>
+
+                <div class="input-group">
+                    <label for="setupGitPath">Path in Repository</label>
+                    <input type="text" id="setupGitPath" placeholder="todos/" value="todos/">
+                </div>
+
+                <div class="setup-actions">
+                    <button class="setup-primary" onclick="completeSetup()">Save & Sync</button>
+                    <button class="setup-secondary" onclick="skipSetup()">Skip for Now</button>
+                </div>
+            </div>
+
+            <div id="setupStatus" class="sync-status" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="main-page" id="mainPage">
+        <div class="container">
+            <header>
+                <div class="app-header">
+                    <h1>What a todo</h1>
+                </div>
+            </header>
+
+            <div class="controls">
+                <div class="input-group">
+                    <input type="text" id="todoInput" placeholder="Enter a new todo...">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="tagsInput" placeholder="Tags (comma-separated)">
+                </div>
+                <div class="input-group">
+                    <select id="prioritySelect">
+                        <option value="low">Low Priority</option>
+                        <option value="medium" selected>Medium Priority</option>
+                        <option value="high">High Priority</option>
+                    </select>
+                </div>
+                <button onclick="addTodo()">Add Todo</button>
+            </div>
+
+            <div class="filter-controls">
+                <button class="filter-btn active" onclick="filterTodos('all')">All</button>
+                <button class="filter-btn" onclick="filterTodos('pending')">Pending</button>
+                <button class="filter-btn" onclick="filterTodos('completed')">Completed</button>
+                <button class="filter-btn" onclick="filterTodos('high')">High Priority</button>
+            </div>
+
+            <div class="todo-list" id="todoList">
+                <div class="empty-state">
+                    <p>No todos yet. Add one above to get started!</p>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <h3>Export & Sync</h3>
+                <div class="export-controls">
+                    <button onclick="pullFromGit()">Pull from Git</button>
+                    <button onclick="syncToGit()">Push to Git</button>
+                    <button onclick="exportToMarkdown()">Download All as Markdown</button>
+                    <button onclick="exportSeparateFiles()" class="secondary-btn">Download Separate Files</button>
+                    <button onclick="previewMarkdown()" class="secondary-btn">Preview Markdown</button>
+                    <button onclick="clearAllTodos()" class="delete-btn">Clear All</button>
+                </div>
+
+                <div id="syncStatus" class="sync-status" style="display: none;"></div>
+                <div id="markdownPreview" class="markdown-preview" style="display: none;"></div>
+            </div>
+            <div class="export-section">
+                <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="public/script.js"></script>
+
+</body>
+
+</html>

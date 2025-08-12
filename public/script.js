@@ -132,6 +132,16 @@ class TodoApp {
     this.render();
   }
 
+  editTodo(id, newText) {
+    const todo = this.todos.find((t) => t.id === id);
+    if (todo && newText.trim()) {
+      todo.text = newText.trim();
+      todo.lastModified = new Date().toISOString();
+      this.saveTodos();
+      this.render();
+    }
+  }
+
   getFilteredTodos() {
     switch (this.currentFilter) {
       case "pending":
@@ -195,6 +205,9 @@ class TodoApp {
                             }
                         </div>
                         <div class="todo-actions">
+                            <button onclick="startEditTodo(${
+                              todo.id
+                            })" class="edit-btn">Edit</button>
                             <button onclick="app.deleteTodo(${
                               todo.id
                             })" class="delete-btn">Delete</button>
@@ -663,7 +676,14 @@ ${
       );
     } catch (error) {
       console.error("Git sync error:", error);
-      this.showSyncStatus(`Sync failed: ${error.message}`, "error");
+      // Only show user-friendly errors, not API noise
+      if (error.message.includes('Repository or path not found')) {
+        this.showSyncStatus(`Sync failed: ${error.message}`, "error");
+      } else if (error.message.includes('Authentication failed')) {
+        this.showSyncStatus(`Sync failed: ${error.message}`, "error");
+      } else {
+        this.showSyncStatus(`Sync failed: Please check your git configuration`, "error");
+      }
     }
   }
 
@@ -832,6 +852,13 @@ ${
 
   showSyncStatus(message, type) {
     const statusEl = document.getElementById("syncStatus");
+    
+    // Don't show intermediate errors during sync - only final results
+    if (type === "error" && message.includes("Failed to")) {
+      console.warn("Sync warning:", message);
+      return; // Don't display API errors to user
+    }
+    
     statusEl.textContent = message;
     statusEl.className = `sync-status ${type}`;
     statusEl.style.display = "block";
@@ -986,7 +1013,8 @@ function openSettings() {
 
 // Keyboard shortcuts
 document.getElementById("todoInput").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
+  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
     addTodo();
   }
 });
@@ -998,4 +1026,87 @@ function toggleAccordion() {
   
   toggle.classList.toggle('active');
   content.classList.toggle('active');
+}
+
+// Todo editing functionality
+let editingStates = new Map(); // Store original states
+
+function startEditTodo(id) {
+  const todo = app.todos.find(t => t.id === id);
+  if (!todo) return;
+
+  // Find the todo item
+  const allItems = document.querySelectorAll('.todo-item');
+  let todoItem = null;
+  
+  for (let item of allItems) {
+    const editBtn = item.querySelector('.edit-btn');
+    if (editBtn && editBtn.getAttribute('onclick').includes(id)) {
+      todoItem = item;
+      break;
+    }
+  }
+  
+  if (!todoItem) return;
+
+  const todoContent = todoItem.querySelector('.todo-content');
+  
+  // Store the original HTML for cancel
+  editingStates.set(id, todoContent.innerHTML);
+  
+  todoContent.innerHTML = `
+    <div class="todo-edit-mode">
+      <textarea class="todo-edit-textarea" id="editTextarea_${id}" rows="15">${todo.text}</textarea>
+      <div class="todo-edit-actions">
+        <button onclick="saveEditTodo(${id})" class="save-btn">Save</button>
+        <button onclick="cancelEditTodo(${id})" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  // Focus and select the textarea
+  const textarea = document.getElementById(`editTextarea_${id}`);
+  textarea.focus();
+  textarea.select();
+}
+
+function saveEditTodo(id) {
+  const textarea = document.getElementById(`editTextarea_${id}`);
+  if (!textarea) return;
+  
+  const newText = textarea.value.trim();
+  if (newText) {
+    app.editTodo(id, newText);
+  } else {
+    cancelEditTodo(id); // Cancel if empty
+  }
+  
+  // Clean up stored state
+  editingStates.delete(id);
+}
+
+function cancelEditTodo(id) {
+  const originalContent = editingStates.get(id);
+  if (!originalContent) {
+    // Fallback: just re-render everything
+    app.render();
+    return;
+  }
+  
+  // Find the todo item and restore original content
+  const allItems = document.querySelectorAll('.todo-item');
+  for (let item of allItems) {
+    const editMode = item.querySelector('.todo-edit-mode');
+    if (editMode) {
+      const textarea = editMode.querySelector(`#editTextarea_${id}`);
+      if (textarea) {
+        const todoContent = item.querySelector('.todo-content');
+        todoContent.innerHTML = originalContent;
+        break;
+      }
+    }
+  }
+  
+  // Clean up stored state
+  editingStates.delete(id);
 }

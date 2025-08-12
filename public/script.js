@@ -69,10 +69,23 @@ class TodoApp {
       this.showMainPage();
       this.autoSync();
     }
+    
+    // Display version info
+    this.displayVersion();
   }
 
   needsSetup() {
     return !this.gitConfig.repoUrl || !this.gitConfig.gitToken;
+  }
+
+  displayVersion() {
+    const versionEl = document.getElementById('versionDisplay');
+    if (versionEl && window.APP_CONFIG) {
+      const { version, buildHash, environment } = window.APP_CONFIG;
+      const envIcon = environment === 'development' ? '🛠️' : '🚀';
+      versionEl.textContent = `${envIcon} v${version} (${buildHash})`;
+      versionEl.title = `Environment: ${environment}\nBuild: ${buildHash}\nVersion: ${version}`;
+    }
   }
 
   showSetupPage() {

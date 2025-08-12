@@ -53,6 +53,24 @@
   background: rgba(255,255,255,0.1);
 }
 
+/* Version info */
+.version-info {
+  margin-top: 16px;
+  text-align: center;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.version-info:hover {
+  opacity: 1;
+}
+
+.version-info small {
+  color: #64748b;
+  font-size: 11px;
+  cursor: help;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
     sans-serif;

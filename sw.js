@@ -1,4 +1,5 @@
-const CACHE_NAME = 'todo-pwa-v1';
+// Auto-generated timestamp: 1755010471696
+const CACHE_NAME = 'todo-pwa-1755010471696';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -37,6 +38,16 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      // Take control of all clients immediately
+      return self.clients.claim();
     })
   );
+});
+
+// Listen for messages from the main thread
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

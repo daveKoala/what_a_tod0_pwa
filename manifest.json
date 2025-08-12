@@ -1,6 +1,7 @@
 {
   "name": "Todo PWA",
   "short_name": "Todos",
+  "version": "2025.08.12",
   "description": "A powerful todo app with git sync capabilities",
   "start_url": ".",
   "display": "standalone",
@@ -20,6 +21,9 @@
       "type": "image/svg+xml"
     }
   ],
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "lang": "en"
 }

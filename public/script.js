@@ -1,9 +1,53 @@
-// Service Worker registration
+// Service Worker registration with update handling
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/sw.js")
-    .then((reg) => console.log("Service Worker registered"))
+    .then((reg) => {
+      console.log("Service Worker registered");
+      
+      // Check for updates
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New update available
+            showUpdateNotification();
+          }
+        });
+      });
+    })
     .catch((err) => console.log("Service Worker registration failed"));
+
+  // Listen for messages from service worker
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.type === 'UPDATE_AVAILABLE') {
+      showUpdateNotification();
+    }
+  });
+}
+
+function showUpdateNotification() {
+  const updateBanner = document.createElement('div');
+  updateBanner.className = 'update-notification';
+  updateBanner.innerHTML = `
+    <div class="update-content">
+      <span>New version available!</span>
+      <button onclick="updateApp()">Update Now</button>
+      <button onclick="dismissUpdate(this)">×</button>
+    </div>
+  `;
+  document.body.appendChild(updateBanner);
+}
+
+function updateApp() {
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({type: 'SKIP_WAITING'});
+  }
+  window.location.reload();
+}
+
+function dismissUpdate(btn) {
+  btn.closest('.update-notification').remove();
 }
 
 // Todo storage and management

@@ -1,11 +1,13 @@
-// Auto-generated timestamp: 1755012054771
-const CACHE_NAME = 'todo-pwa-1755012054771';
+// Auto-generated timestamp: 1755012406749
+const CACHE_NAME = 'todo-pwa-1755012406749';
+// Dynamic URLs based on environment (GitHub Pages vs localhost)
 const urlsToCache = [
   './',
   './index.html',
   './public/style.css',
   './public/script.js',
-  './manifest.json'
+  './manifest.json',
+  './config.js'
 ];
 
 self.addEventListener('install', event => {

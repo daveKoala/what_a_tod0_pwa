@@ -1,7 +1,8 @@
 // Service Worker registration with update handling
 if ("serviceWorker" in navigator) {
+  const { serviceWorkerPath, serviceWorkerScope } = window.APP_CONFIG;
   navigator.serviceWorker
-    .register("./sw.js", { scope: "./" })
+    .register(serviceWorkerPath, { scope: serviceWorkerScope })
     .then((reg) => {
       console.log("Service Worker registered successfully", reg);
       
@@ -19,7 +20,7 @@ if ("serviceWorker" in navigator) {
     .catch((err) => {
       console.error("Service Worker registration failed:", err);
       console.log("Attempting to fetch sw.js directly to debug...");
-      fetch("./sw.js").then(r => console.log("sw.js fetch status:", r.status)).catch(e => console.log("sw.js fetch error:", e));
+      fetch(window.APP_CONFIG.serviceWorkerPath).then(r => console.log("sw.js fetch status:", r.status)).catch(e => console.log("sw.js fetch error:", e));
     });
 
   // Listen for messages from service worker

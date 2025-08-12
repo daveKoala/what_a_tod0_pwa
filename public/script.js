@@ -1,7 +1,7 @@
 // Service Worker registration with update handling
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/sw.js")
+    .register("./sw.js")
     .then((reg) => {
       console.log("Service Worker registered successfully", reg);
       

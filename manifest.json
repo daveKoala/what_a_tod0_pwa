@@ -3,7 +3,7 @@
   "short_name": "Todos",
   "version": "2025.08.12",
   "description": "A powerful todo app with git sync capabilities",
-  "start_url": ".",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",

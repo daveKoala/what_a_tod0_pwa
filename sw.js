@@ -1,11 +1,11 @@
-// Auto-generated timestamp: 1755011550115
-const CACHE_NAME = 'todo-pwa-1755011550115';
+// Auto-generated timestamp: 1755011891012
+const CACHE_NAME = 'todo-pwa-1755011891012';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/public/style.css',
-  '/public/script.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './public/style.css',
+  './public/script.js',
+  './manifest.json'
 ];
 
 self.addEventListener('install', event => {

@@ -27,8 +27,8 @@ const config = {
   
   // Version info
   version: '2025.08.12',
-  buildTimestamp: 1755016055356,
-  buildHash: '8r8v24',
+  buildTimestamp: 1755016338581,
+  buildHash: '8rexlh',
   
   // Environment info
   environment: isLocal ? 'development' : 'production',

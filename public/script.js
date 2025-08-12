@@ -408,6 +408,35 @@ ${
       return;
     }
 
+    // Normalize and validate repository format
+    let repoUrl = this.gitConfig.repoUrl.trim();
+    
+    // Handle full GitHub URLs and convert to owner/repo format
+    if (repoUrl.includes('github.com/')) {
+      const match = repoUrl.match(/github\.com\/([a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+)/);
+      if (match) {
+        repoUrl = match[1].replace(/\.git$/, ''); // Remove .git suffix if present
+      }
+    }
+    
+    // Remove trailing .git if present
+    repoUrl = repoUrl.replace(/\.git$/, '');
+    
+    // Validate final format: username/repository
+    const repoFormat = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
+    if (!repoFormat.test(repoUrl)) {
+      if (!silent) this.showSyncStatus(`Invalid repository format. Current: "${this.gitConfig.repoUrl}"
+      Expected: "username/repository-name"
+      Examples: "johndoe/my-todos" or "https://github.com/johndoe/my-todos"`, "error");
+      return;
+    }
+    
+    // Update the config with normalized repo URL
+    if (repoUrl !== this.gitConfig.repoUrl) {
+      this.gitConfig.repoUrl = repoUrl;
+      this.saveGitConfig({repoUrl});
+    }
+
     if (!silent)
       this.showSyncStatus("Pulling todos from git repository...", "loading");
 
@@ -574,6 +603,35 @@ ${
       return;
     }
 
+    // Normalize and validate repository format
+    let repoUrl = this.gitConfig.repoUrl.trim();
+    
+    // Handle full GitHub URLs and convert to owner/repo format
+    if (repoUrl.includes('github.com/')) {
+      const match = repoUrl.match(/github\.com\/([a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+)/);
+      if (match) {
+        repoUrl = match[1].replace(/\.git$/, ''); // Remove .git suffix if present
+      }
+    }
+    
+    // Remove trailing .git if present
+    repoUrl = repoUrl.replace(/\.git$/, '');
+    
+    // Validate final format: username/repository
+    const repoFormat = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
+    if (!repoFormat.test(repoUrl)) {
+      this.showSyncStatus(`Invalid repository format. Current: "${this.gitConfig.repoUrl}"
+      Expected: "username/repository-name"
+      Examples: "johndoe/my-todos" or "https://github.com/johndoe/my-todos"`, "error");
+      return;
+    }
+    
+    // Update the config with normalized repo URL
+    if (repoUrl !== this.gitConfig.repoUrl) {
+      this.gitConfig.repoUrl = repoUrl;
+      this.saveGitConfig({repoUrl});
+    }
+
     this.showSyncStatus("Syncing to git repository...", "loading");
 
     try {
@@ -699,10 +757,26 @@ ${
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(
-        `Failed to ${sha ? "update" : "create"} ${filename}: ${error.message}`
-      );
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const error = await response.json();
+        errorMessage = error.message || errorMessage;
+      } catch (e) {
+        // Response might not be JSON
+      }
+      
+      // Provide more specific error messages
+      if (response.status === 404) {
+        throw new Error(`Repository or path not found. Please check:
+        • Repository: ${repoUrl}
+        • Branch: ${gitBranch}
+        • Path: ${path}
+        • Token permissions`);
+      } else if (response.status === 401 || response.status === 403) {
+        throw new Error(`Authentication failed. Please check your Personal Access Token has the required permissions (repo scope).`);
+      } else {
+        throw new Error(`Failed to ${sha ? "update" : "create"} ${filename}: ${errorMessage}`);
+      }
     }
 
     return response.json();

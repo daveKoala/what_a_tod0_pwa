@@ -443,19 +443,135 @@ button:disabled {
   border: 1px solid #93c5fd;
 }
 
-.controls {
-  flex-direction: column;
+/* Mobile-first responsive adjustments */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+  }
+
+  .export-controls {
+    flex-direction: column;
+  }
+
+  .todo-item {
+    flex-wrap: wrap;
+  }
+
+  .todo-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .accordion-inner {
+    flex-direction: column;
+  }
 }
 
-.export-controls {
-  flex-direction: column;
-}
+/* Desktop improvements */
+@media (min-width: 769px) {
+  .container {
+    max-width: 1000px;
+    padding: 2rem;
+  }
 
-.todo-item {
-  flex-wrap: wrap;
-}
+  .controls {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 1rem;
+    align-items: end;
+  }
 
-.todo-actions {
-  width: 100%;
-  justify-content: flex-end;
+  .export-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .export-main {
+    grid-column: 1;
+  }
+
+  .export-secondary {
+    grid-column: 2;
+  }
+
+  .accordion-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .todo-list {
+    margin-bottom: 2rem;
+  }
+
+  .filter-controls {
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .filter-btn {
+    min-width: 120px;
+  }
+
+  /* Two-column layout for todos on wider screens */
+  @media (min-width: 1024px) {
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+
+    .todos-column {
+      grid-column: 1;
+    }
+
+    .sidebar-column {
+      grid-column: 2;
+      position: sticky;
+      top: 2rem;
+      height: fit-content;
+    }
+
+    .export-section {
+      display: block;
+      margin-top: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+    }
+
+    .export-section h3 {
+      margin-bottom: 1.5rem;
+      color: #1f2937;
+      font-size: 1.125rem;
+    }
+
+    .export-main {
+      margin-bottom: 1.5rem;
+    }
+
+    .settings-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .accordion-content.active {
+      max-height: 200px;
+    }
+  }
+
+  /* Extra wide screens */
+  @media (min-width: 1440px) {
+    .container {
+      max-width: 1200px;
+    }
+
+    .main-content {
+      grid-template-columns: 3fr 1fr;
+    }
+  }
 }

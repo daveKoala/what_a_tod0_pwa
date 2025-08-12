@@ -24,7 +24,8 @@
             <div class="setup-form">
                 <div class="input-group">
                     <label for="setupRepoUrl">Repository URL</label>
-                    <input type="text" id="setupRepoUrl" placeholder="e.g., username/my-todos">
+                    <input type="text" id="setupRepoUrl"
+                        placeholder="username/repo-name or https://github.com/username/repo-name">
                 </div>
 
                 <div class="input-group">
@@ -78,52 +79,64 @@
                 <button onclick="addTodo()">Add Todo</button>
             </div>
 
-            <div class="filter-controls">
-                <button class="filter-btn active" onclick="filterTodos('all')">All</button>
-                <button class="filter-btn" onclick="filterTodos('pending')">Pending</button>
-                <button class="filter-btn" onclick="filterTodos('completed')">Completed</button>
-                <button class="filter-btn" onclick="filterTodos('high')">High Priority</button>
-            </div>
+            <div class="main-content">
+                <div class="todos-column">
+                    <div class="filter-controls">
+                        <button class="filter-btn active" onclick="filterTodos('all')">All</button>
+                        <button class="filter-btn" onclick="filterTodos('pending')">Pending</button>
+                        <button class="filter-btn" onclick="filterTodos('completed')">Completed</button>
+                        <button class="filter-btn" onclick="filterTodos('high')">High Priority</button>
+                    </div>
 
-            <div class="todo-list" id="todoList">
-                <div class="empty-state">
-                    <p>No todos yet. Add one above to get started!</p>
-                </div>
-            </div>
-
-            <div class="export-section">
-                <h3>Export & Sync</h3>
-                <div class="export-controls">
-                    <button onclick="pullFromGit()">Pull from Git</button>
-                    <button onclick="syncToGit()">Push to Git</button>
-                </div>
-                
-                <div class="accordion">
-                    <button class="accordion-toggle" onclick="toggleAccordion()">
-                        <span>More Export Options</span>
-                        <span class="accordion-icon">▶</span>
-                    </button>
-                    <div class="accordion-content" id="accordionContent">
-                        <div class="accordion-inner">
-                            <button onclick="exportToMarkdown()">Download All as Markdown</button>
-                            <button onclick="exportSeparateFiles()" class="secondary-btn">Download Separate Files</button>
-                            <button onclick="previewMarkdown()" class="secondary-btn">Preview Markdown</button>
-                            <button onclick="clearAllTodos()" class="delete-btn">Clear All</button>
+                    <div class="todo-list" id="todoList">
+                        <div class="empty-state">
+                            <p>No todos yet. Add one above to get started!</p>
                         </div>
                     </div>
                 </div>
 
-                <div id="syncStatus" class="sync-status" style="display: none;"></div>
-                <div id="markdownPreview" class="markdown-preview" style="display: none;"></div>
-            </div>
-            <div class="export-section">
-                <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+                <div class="sidebar-column">
+                    <div class="export-section">
+                        <h3>Export & Sync</h3>
+                        <div class="export-main">
+                            <div class="export-controls">
+                                <button onclick="pullFromGit()">Pull from Git</button>
+                                <button onclick="syncToGit()">Push to Git</button>
+                            </div>
+                        </div>
+
+                        <div class="export-secondary">
+                            <div class="accordion">
+                                <button class="accordion-toggle" onclick="toggleAccordion()">
+                                    <span>More Export Options</span>
+                                    <span class="accordion-icon">▶</span>
+                                </button>
+                                <div class="accordion-content" id="accordionContent">
+                                    <div class="accordion-inner">
+                                        <button onclick="exportToMarkdown()">Download All as Markdown</button>
+                                        <button onclick="exportSeparateFiles()" class="secondary-btn">Download Separate
+                                            Files</button>
+                                        <button onclick="previewMarkdown()" class="secondary-btn">Preview
+                                            Markdown</button>
+                                        <button onclick="clearAllTodos()" class="delete-btn">Clear All</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="syncStatus" class="sync-status" style="display: none;"></div>
+                        <div id="markdownPreview" class="markdown-preview" style="display: none;"></div>
+
+                        <div class="settings-section">
+                            <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="public/script.js"></script>
-
 </body>
 
 </html>

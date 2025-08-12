@@ -419,6 +419,13 @@ ${
       return;
     }
 
+    // Prevent concurrent sync operations
+    if (this.syncInProgress) {
+      if (!silent) this.showSyncStatus("Sync already in progress...", "loading");
+      return;
+    }
+    this.syncInProgress = true;
+
     // Normalize and validate repository format
     let repoUrl = this.gitConfig.repoUrl.trim();
     
@@ -492,6 +499,8 @@ ${
       console.error("Git pull error:", error);
       if (!silent)
         this.showSyncStatus(`Pull failed: ${error.message}`, "error");
+    } finally {
+      this.syncInProgress = false;
     }
   }
 
@@ -614,6 +623,13 @@ ${
       return;
     }
 
+    // Prevent concurrent sync operations
+    if (this.syncInProgress) {
+      this.showSyncStatus("Sync already in progress...", "loading");
+      return;
+    }
+    this.syncInProgress = true;
+
     // Normalize and validate repository format
     let repoUrl = this.gitConfig.repoUrl.trim();
     
@@ -672,6 +688,9 @@ ${
         `Successfully synced ${files.length} todos to git repository`,
         "success"
       );
+      
+      // Small delay to ensure GitHub API consistency
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
       console.error("Git sync error:", error);
       // Only show user-friendly errors, not API noise
@@ -682,6 +701,8 @@ ${
       } else {
         this.showSyncStatus(`Sync failed: Please check your git configuration`, "error");
       }
+    } finally {
+      this.syncInProgress = false;
     }
   }
 

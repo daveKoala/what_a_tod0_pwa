@@ -3,7 +3,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/sw.js")
     .then((reg) => {
-      console.log("Service Worker registered");
+      console.log("Service Worker registered successfully", reg);
       
       // Check for updates
       reg.addEventListener('updatefound', () => {
@@ -16,7 +16,11 @@ if ("serviceWorker" in navigator) {
         });
       });
     })
-    .catch((err) => console.log("Service Worker registration failed"));
+    .catch((err) => {
+      console.error("Service Worker registration failed:", err);
+      console.log("Attempting to fetch sw.js directly to debug...");
+      fetch("/sw.js").then(r => console.log("sw.js fetch status:", r.status)).catch(e => console.log("sw.js fetch error:", e));
+    });
 
   // Listen for messages from service worker
   navigator.serviceWorker.addEventListener('message', event => {

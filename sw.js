@@ -1,5 +1,5 @@
-// Auto-generated timestamp: 1755011210020
-const CACHE_NAME = 'todo-pwa-1755011210020';
+// Auto-generated timestamp: 1755011550115
+const CACHE_NAME = 'todo-pwa-1755011550115';
 const urlsToCache = [
   '/',
   '/index.html',

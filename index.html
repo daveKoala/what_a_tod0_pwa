@@ -96,10 +96,21 @@
                 <div class="export-controls">
                     <button onclick="pullFromGit()">Pull from Git</button>
                     <button onclick="syncToGit()">Push to Git</button>
-                    <button onclick="exportToMarkdown()">Download All as Markdown</button>
-                    <button onclick="exportSeparateFiles()" class="secondary-btn">Download Separate Files</button>
-                    <button onclick="previewMarkdown()" class="secondary-btn">Preview Markdown</button>
-                    <button onclick="clearAllTodos()" class="delete-btn">Clear All</button>
+                </div>
+                
+                <div class="accordion">
+                    <button class="accordion-toggle" onclick="toggleAccordion()">
+                        <span>More Export Options</span>
+                        <span class="accordion-icon">▶</span>
+                    </button>
+                    <div class="accordion-content" id="accordionContent">
+                        <div class="accordion-inner">
+                            <button onclick="exportToMarkdown()">Download All as Markdown</button>
+                            <button onclick="exportSeparateFiles()" class="secondary-btn">Download Separate Files</button>
+                            <button onclick="previewMarkdown()" class="secondary-btn">Preview Markdown</button>
+                            <button onclick="clearAllTodos()" class="delete-btn">Clear All</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="syncStatus" class="sync-status" style="display: none;"></div>

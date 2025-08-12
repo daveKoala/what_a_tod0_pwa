@@ -916,3 +916,12 @@ document.getElementById("todoInput").addEventListener("keypress", (e) => {
     addTodo();
   }
 });
+
+// Accordion functionality
+function toggleAccordion() {
+  const toggle = document.querySelector('.accordion-toggle');
+  const content = document.getElementById('accordionContent');
+  
+  toggle.classList.toggle('active');
+  content.classList.toggle('active');
+}

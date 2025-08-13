@@ -26,9 +26,9 @@ const config = {
   manifestStartUrl: isLocal ? '/' : './',
   
   // Version info
-  version: '2025.08.12',
-  buildTimestamp: 1755016338581,
-  buildHash: '8rexlh',
+  version: '2025.08.13',
+  buildTimestamp: 1755092793739,
+  buildHash: 'a0xmrv',
   
   // Environment info
   environment: isLocal ? 'development' : 'production',

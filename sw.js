@@ -1,11 +1,16 @@
-// Auto-generated timestamp: 1755016338581
-const CACHE_NAME = 'todo-pwa-1755016338581';
+// Auto-generated timestamp: 1755092793739
+const CACHE_NAME = 'todo-pwa-1755092793739';
 // Dynamic URLs based on environment (GitHub Pages vs localhost)
 const urlsToCache = [
   './',
   './index.html',
   './public/style.css',
-  './public/script.js',
+  './public/service-worker.js',
+  './public/app.js', 
+  './public/todo-actions.js',
+  './public/git-sync.js',
+  './public/git-api.js',
+  './public/ui-handlers.js',
   './manifest.json',
   './config.js'
 ];

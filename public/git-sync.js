@@ -161,6 +161,9 @@ TodoApp.prototype.syncToGit = async function() {
     return;
   }
   
+  // Log the repository URL for debugging
+  console.log(`Syncing to repository: ${repoUrl}`);
+  
   // Update the config with normalized repo URL
   if (repoUrl !== this.gitConfig.repoUrl) {
     this.gitConfig.repoUrl = repoUrl;
@@ -176,12 +179,7 @@ TodoApp.prototype.syncToGit = async function() {
     // Generate markdown files for current todos
     const files = this.generateMarkdown(true);
 
-    // Create/update files
-    const updatePromises = files.map((file) =>
-      this.createOrUpdateFile(file.filename, file.content)
-    );
-
-    // Delete files for todos that no longer exist
+    // Delete files first to avoid conflicts
     const currentFilenames = new Set(files.map((f) => f.filename));
     const filesToDelete = existingFiles
       .filter(
@@ -192,9 +190,24 @@ TodoApp.prototype.syncToGit = async function() {
     console.log(`Files to delete: ${filesToDelete.length}`, filesToDelete);
     console.log(`Current files: ${files.length}`, files.map(f => f.filename));
     
-    const deletePromises = filesToDelete.map((filename) => this.deleteFile(filename));
-
-    await Promise.all([...updatePromises, ...deletePromises]);
+    // Process deletions first
+    if (filesToDelete.length > 0) {
+      await Promise.all(filesToDelete.map((filename) => this.deleteFile(filename)));
+      // Wait for deletions to propagate
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+    
+    // Then create/update files sequentially to avoid conflicts
+    for (const file of files) {
+      try {
+        await this.createOrUpdateFile(file.filename, file.content);
+        // Small delay between updates to avoid race conditions
+        await new Promise(resolve => setTimeout(resolve, 200));
+      } catch (error) {
+        console.error(`Failed to sync ${file.filename}:`, error);
+        throw error;
+      }
+    }
 
     this.showSyncStatus(
       `Successfully synced ${files.length} todos to git repository`,

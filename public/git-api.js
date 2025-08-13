@@ -99,7 +99,7 @@ TodoApp.prototype.generateMarkdown = function(separateFiles = false) {
   });
 };
 
-TodoApp.prototype.createOrUpdateFile = async function(filename, content) {
+TodoApp.prototype.createOrUpdateFile = async function(filename, content, retryCount = 0) {
   const { repoUrl, gitToken, gitBranch, gitPath } = this.gitConfig;
   const path = `${gitPath || ""}${filename}`;
 
@@ -151,6 +151,13 @@ TodoApp.prototype.createOrUpdateFile = async function(filename, content) {
     const error = await response.json();
     const errorMessage = error.message || "Unknown error";
     
+    // Handle SHA conflicts with retry
+    if (response.status === 409 && retryCount < 2) {
+      console.log(`SHA conflict for ${filename}, retrying... (attempt ${retryCount + 1})`);
+      await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Progressive delay
+      return this.createOrUpdateFile(filename, content, retryCount + 1);
+    }
+    
     // Provide more specific error messages
     if (response.status === 404) {
       throw new Error(`Repository or path not found. Please check:
@@ -160,6 +167,8 @@ TodoApp.prototype.createOrUpdateFile = async function(filename, content) {
       • Token permissions`);
     } else if (response.status === 401 || response.status === 403) {
       throw new Error(`Authentication failed. Please check your Personal Access Token has the required permissions (repo scope).`);
+    } else if (response.status === 409) {
+      throw new Error(`Conflict: ${filename} was modified by another process. Please try again.`);
     } else {
       throw new Error(`Failed to ${sha ? "update" : "create"} ${filename}: ${errorMessage}`);
     }

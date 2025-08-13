@@ -1,5 +1,5 @@
-// Auto-generated timestamp: 1755092806048
-const CACHE_NAME = 'todo-pwa-1755092806048';
+// Auto-generated timestamp: 1755095303264
+const CACHE_NAME = 'todo-pwa-1755095303264';
 // Dynamic URLs based on environment (GitHub Pages vs localhost)
 const urlsToCache = [
   './',
